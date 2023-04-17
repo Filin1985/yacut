@@ -1,4 +1,4 @@
-from flask import flash, redirect, render_template, url_for
+from flask import flash, redirect, render_template, request
 
 from . import app, db
 from .constants import FLASH_SHORT_ID_EXISTS, SHORT_ID_INVALID
@@ -30,11 +30,7 @@ def index_view():
         )
         db.session.add(short_url)
         db.session.commit()
-        flash(
-            url_for(
-                'redirect_to_original', short_url=custom_id, _external=True
-            ), 'full_link'
-        )
+        flash(f'{request.base_url}{custom_id}', 'full_link')
     return render_template('index.html', form=form)
 
 
