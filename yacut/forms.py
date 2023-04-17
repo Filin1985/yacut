@@ -4,7 +4,7 @@ from wtforms.validators import Length, Optional, DataRequired
 
 
 class URLForm(FlaskForm):
-    original_link  = URLField(
+    original_link = URLField(
         'Введите ссылку',
         validators=[DataRequired(message='Обязательное поле'), Length(min=1)]
     )

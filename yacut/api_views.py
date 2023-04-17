@@ -44,6 +44,7 @@ def post_short_url():
     db.session.commit()
     return jsonify(url_object.to_dict()), HTTPStatus.CREATED
 
+
 @app.route('/api/id/<string:short_id>/', methods=['GET'])
 def get_short_url(short_id):
     url_object = URLMap.query.filter_by(short=short_id).first()
