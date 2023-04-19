@@ -1,40 +1,49 @@
-from flask import flash, redirect, render_template, request
+from http import HTTPStatus
 
-from . import app, db
-from .constants import FLASH_SHORT_ID_EXISTS, SHORT_ID_INVALID
+from flask import abort, flash, redirect, render_template, url_for
+
+from . import app
+from .error_handlers import CreatingError
 from .forms import URLForm
 from .models import URLMap
-from .utils import check_validity_shirt_id
+
+
+SHORT_ID_INVALID = "Ссылка должна состоять только из цифр и латинских букв!"
+FLASH_SHORT_ID_EXISTS = 'Имя {custom_id} уже занято!'
 
 
 @app.route('/', methods=['GET', 'POST'])
 def index_view():
     form = URLForm()
-    if form.validate_on_submit():
-        custom_id = form.custom_id.data
-        url_object = URLMap()
-        if not custom_id or custom_id == '':
-            custom_id = url_object.get_unique_short_id()
-        if URLMap.query.filter_by(short=custom_id).first():
-            flash(FLASH_SHORT_ID_EXISTS.format(
-                custom_id=custom_id),
-                'name_exists'
-            )
-            return render_template('index.html', form=form)
-        if not check_validity_shirt_id(custom_id):
-            flash(SHORT_ID_INVALID.format(custom_id=custom_id), 'name_invalid')
-            return render_template('index.html', form=form)
-        short_url = URLMap(
-            original=form.original_link.data,
-            short=custom_id
+    if not form.validate_on_submit():
+        return render_template('index.html', form=form)
+    original, custom_id = form.original_link.data, form.custom_id.data
+    if URLMap.check_unique_short_id(custom_id):
+        flash(
+            FLASH_SHORT_ID_EXISTS.format(custom_id=custom_id), 'name_exists'
         )
-        db.session.add(short_url)
-        db.session.commit()
-        flash(f'{request.base_url}{custom_id}', 'full_link')
-    return render_template('index.html', form=form)
+        return render_template('index.html', form=form)
+    if (
+        custom_id != '' and
+        custom_id is not None and
+        not URLMap.validate_short_id(custom_id)
+    ):
+        flash(SHORT_ID_INVALID.format(custom_id=custom_id), 'name_invalid')
+        return render_template('index.html', form=form)
+    try:
+        url_object = URLMap.create_new_url_object(original, custom_id)
+    except CreatingError:
+        abort(HTTPStatus.INTERNAL_SERVER_ERROR)
+    return render_template(
+        'index.html',
+        form=form,
+        link=url_for('index_view', _external=True) + url_object.short
+    )
 
 
 @app.route('/<string:short_url>', methods=['GET'])
 def redirect_to_original(short_url):
-    return redirect(
-        URLMap.query.filter_by(short=short_url).first_or_404().original)
+    url_object = URLMap.check_unique_short_id(short_url)
+    if not url_object:
+        abort(HTTPStatus.NOT_FOUND)
+    return redirect(url_object.original)

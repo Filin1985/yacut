@@ -12,24 +12,20 @@
               </div>
               <div class="col-sm">
                 <form method="POST" novalidate>
-                    {{ form.csrf_token }}
-                    {{ form.original_link(class="form-control form-control-lg py-2 mb-3", placeholder=form.original_link.label.text) }}
-                    <p>
-                      {% if form.original_link.errors %}
-                        {% for error in errors %}
-                          <span style="color:red">{{ error }}</span>
-                        {% endfor %}
-                      {% endif %}
-                    </p>
+                  {{ form.csrf_token }}
+                  {{ form.original_link(class="form-control form-control-lg py-2 mb-3", placeholder=form.original_link.label.text) }}
+                  <p>
+                    {% for error in errors %}
+                      <span style="color:red">{{ error }}</span>
+                    {% endfor %}
+                  </p>
                     {{ form.custom_id(class="form-control form-control-lg py-2 mb-3", placeholder=form.custom_id.label.text) }}
-              <p>
-                {% if form.custom_id.errors %}
-                  {% for error in errors %}
-                    <span style="color:red">{{ error }}</span>
-                  {% endfor %}
-                {% endif %}
-              </p>
-              {{ form.submit(class="btn btn-primary")}}
+                  <p>
+                    {% for error in errors %}
+                      <span style="color:red">{{ error }}</span>
+                    {% endfor %}
+                  </p>
+                  {{ form.submit(class="btn btn-primary")}}
                 </form>
               </div>
               <div class="col-sm">
@@ -43,14 +39,10 @@
               <div class="col-sm">
                 <p class="text-center">
                 <h5 class="text-center">
-                  {% with messages = get_flashed_messages(category_filter=["full_link"]) %}
-                    {% if messages %}
-                      {% for message in messages %}
-                        <p class="text-center my-4">Ваша короткая ссылка готова</p>
-                        <a href="{{message}}">{{message}}</a>
-                      {% endfor %}
-                    {% endif %}
-                  {% endwith %} 
+                  {% if link %}
+                    <p class="text-center my-4">Ваша короткая ссылка готова</p>
+                    <a href="{{link}}">{{link}}</a>
+                  {% endif %}
                   {% with messages = get_flashed_messages(category_filter=["name_exists"]) %}
                     {% if messages %}
                       {% for message in messages %}
