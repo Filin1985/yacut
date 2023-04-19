@@ -2,17 +2,14 @@ from http import HTTPStatus
 
 from flask import jsonify, request
 
-from .constants import (
-    EMPTY_REQUEST,
-    SHORT_ID_EXISTS,
-    INCORRECT_URL,
-    URL_REQUIRED,
-    UNACCEPTABLE_URL
-)
 from .error_handlers import InvalidAPIUsage
-from .models import URLMap
-from .utils import check_validity_shirt_id, check_original_url
+from .models import URLMap, SHORT_ID_EXISTS, UNACCEPTABLE_URL
 from . import app, db
+
+
+INCORRECT_URL = 'Введите корректный URL адрес'
+EMPTY_REQUEST = 'Отсутствует тело запроса'
+URL_REQUIRED = '"url" является обязательным полем!'
 
 
 @app.route('/api/id/', methods=['POST'])
@@ -25,7 +22,7 @@ def post_short_url():
     original = data.get('url')
     url_object = URLMap()
     custom_id = data.get('custom_id', None)
-    if not check_original_url(original):
+    if not URLMap.check_original_url(original):
         raise InvalidAPIUsage(INCORRECT_URL)
     if not custom_id or custom_id == '':
         custom_id = url_object.get_unique_short_id()
@@ -34,7 +31,8 @@ def post_short_url():
         raise InvalidAPIUsage(
             SHORT_ID_EXISTS.format(custom_id=custom_id)
         )
-    if not check_validity_shirt_id(custom_id):
+    if not URLMap.validate_short_id(custom_id):
+        print('hello')
         raise InvalidAPIUsage(
             UNACCEPTABLE_URL,
             HTTPStatus.BAD_REQUEST
