@@ -32,7 +32,6 @@ def post_short_url():
             SHORT_ID_EXISTS.format(custom_id=custom_id)
         )
     if not URLMap.validate_short_id(custom_id):
-        print('hello')
         raise InvalidAPIUsage(
             UNACCEPTABLE_URL,
             HTTPStatus.BAD_REQUEST

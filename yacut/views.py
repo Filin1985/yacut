@@ -31,11 +31,9 @@ def index_view():
         flash(SHORT_ID_INVALID.format(custom_id=custom_id), 'name_invalid')
         return render_template('index.html', form=form)
     try:
-        print(original, custom_id)
         url_object = URLMap.create_new_url_object(original, custom_id)
     except CreatingError:
         abort(HTTPStatus.INTERNAL_SERVER_ERROR)
-    print(url_object)
     return render_template(
         'index.html',
         form=form,
