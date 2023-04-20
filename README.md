@@ -12,7 +12,7 @@
 - Python
 - Flask
 
-1. Клонировать репозиторий и перейти в него в командной строке:
+### 1. Клонировать репозиторий и перейти в него в командной строке:
 
 ```
 git clone https://github.com/Filin1985/yacut.git
@@ -50,7 +50,7 @@ python3 -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-2. База данных и переменные окружения
+### 2. База данных и переменные окружения
 
 В проекте используется база данных SQLite
 
@@ -63,7 +63,7 @@ DATABASE_URI=sqlite:///yacut_db.sqlite3
 SECRET_KEY='Ваш секретный ключ'
 ```
 
-3. Запуск проекта
+### 3. Запуск проекта
 
 Создаем базу данных
 
@@ -79,11 +79,9 @@ flask run
 
 Открываем приложение по адресу
 
-[http://localhost:5000/](http://localhost:5000/)
-
 http://localhost:5000/
 
-4. API
+### 4. API
 
 Эндпоинты:
 
@@ -113,4 +111,4 @@ Payload:
 }
 ```
 
-** Автор [Марат Ихсанов](https://github.com/Filin1985)**
+**Автор [Марат Ихсанов](https://github.com/Filin1985)**
