@@ -46,10 +46,8 @@ class URLMap(db.Model):
     def get_unique_short_id():
         for _ in range(GENERATION_NUMBER):
             short_id = ''.join(choices(
-                ALLOWED_SYMBOLS,
-                k=SHORT_LENGTH
-                )
-            )
+                ALLOWED_SYMBOLS,k=SHORT_LENGTH
+            ))
             if not URLMap.check_unique_short_id(short_id):
                 return short_id
 
