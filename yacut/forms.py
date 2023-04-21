@@ -10,6 +10,7 @@ LINK_REQUIRED = 'Обязательное поле'
 LINK_INCORRECT = 'Введите корректный адресс ссылки'
 SHORT_LINK_HINT = 'Введите ваш вариант короткой ссылки'
 SUBMIT_HINT = 'Создать'
+REGEXP_MESSAGE = 'Допустимы только цифры и латинские буквы'
 
 
 class URLForm(FlaskForm):
@@ -23,9 +24,6 @@ class URLForm(FlaskForm):
         SHORT_LINK_HINT,
         validators=[Length(max=MAX_SHORT_ID_SIZE),
                     Optional(),
-                    Regexp(
-                        regex=SHORT_ID_REGEXP,
-                        message='Допустимы только цифры и латинские буквы'
-                    )]
+                    Regexp(regex=SHORT_ID_REGEXP, message=REGEXP_MESSAGE)]
     )
     submit = SubmitField(SUBMIT_HINT)
