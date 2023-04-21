@@ -25,13 +25,13 @@ def index_view():
         flash(error.message)
         return render_template('index.html', form=form)
     return render_template(
-            'index.html',
-            form=form,
-            link=url_for(
-                'redirect_to_original',
-                short_url=url_object.short,
-                _external=True
-            )
+        'index.html',
+        form=form,
+        link=url_for(
+            'redirect_to_original',
+            short_url=url_object.short,
+            _external=True
+        )
     )
 
 
