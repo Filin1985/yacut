@@ -1,9 +1,8 @@
 from http import HTTPStatus
 
-from flask import abort, flash, redirect, render_template, url_for
+from flask import abort, redirect, render_template, flash, url_for
 
 from . import app
-from .error_handlers import CreatingError
 from .forms import URLForm
 from .models import URLMap
 
@@ -18,26 +17,21 @@ def index_view():
     if not form.validate_on_submit():
         return render_template('index.html', form=form)
     original, custom_id = form.original_link.data, form.custom_id.data
-    if URLMap.check_unique_short_id(custom_id):
-        flash(
-            FLASH_SHORT_ID_EXISTS.format(custom_id=custom_id), 'name_exists'
-        )
-        return render_template('index.html', form=form)
-    if (
-        custom_id != '' and
-        custom_id is not None and
-        not URLMap.validate_short_id(custom_id)
-    ):
-        flash(SHORT_ID_INVALID.format(custom_id=custom_id), 'name_invalid')
-        return render_template('index.html', form=form)
     try:
-        url_object = URLMap.create_new_url_object(original, custom_id)
-    except CreatingError:
-        abort(HTTPStatus.INTERNAL_SERVER_ERROR)
+        url_object = URLMap.create_new_url_object(
+            original, custom_id, FLASH_SHORT_ID_EXISTS, SHORT_ID_INVALID
+        )
+    except Exception as error:
+        flash(error.message)
+        return render_template('index.html', form=form)
     return render_template(
-        'index.html',
-        form=form,
-        link=url_for('index_view', _external=True) + url_object.short
+            'index.html',
+            form=form,
+            link=url_for(
+                'redirect_to_original',
+                short_url=url_object.short,
+                _external=True
+            )
     )
 
 
