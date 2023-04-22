@@ -1,13 +1,15 @@
 import os
+import re
+from string import ascii_letters, digits
 
 
-MAX_SYMBOLS = 6
+ALLOWED_SYMBOLS = ascii_letters + digits
 GENERATION_NUMBER = 10
-MIN_SHORT_ID_SIZE = 1
-MAX_SHORT_ID_SIZE = 16
+MAX_CUSTOM_ID_SIZE = 16
 MAX_ORIGINAL_SIZE = 2048
-SHORT_LENGTH = 6
-SHORT_ID_REGEXP = r'^[a-zA-Z\d]{1,16}$'
+CUSTOM_ID_LENGTH = 6
+CUSTOM_ID_REGEXP = r'[' + re.escape(ALLOWED_SYMBOLS) + r']+'
+REDIRECT_FUNCTION = 'redirect_to_original'
 
 
 class Config(object):
