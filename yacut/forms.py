@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import SubmitField, URLField
 from wtforms.validators import Length, Optional, DataRequired, URL, Regexp
 
-from settings import MAX_ORIGINAL_SIZE, MAX_SHORT_ID_SIZE, SHORT_ID_REGEXP
+from settings import MAX_ORIGINAL_SIZE, MAX_CUSTOM_ID_SIZE, CUSTOM_ID_REGEXP
 
 
 LINK_HINT = 'Введите ссылку'
@@ -22,8 +22,8 @@ class URLForm(FlaskForm):
     )
     custom_id = URLField(
         SHORT_LINK_HINT,
-        validators=[Length(max=MAX_SHORT_ID_SIZE),
+        validators=[Length(max=MAX_CUSTOM_ID_SIZE),
                     Optional(),
-                    Regexp(regex=SHORT_ID_REGEXP, message=REGEXP_MESSAGE)]
+                    Regexp(regex=CUSTOM_ID_REGEXP, message=REGEXP_MESSAGE)]
     )
     submit = SubmitField(SUBMIT_HINT)

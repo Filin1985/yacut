@@ -15,13 +15,13 @@
                   {{ form.csrf_token }}
                   {{ form.original_link(class="form-control form-control-lg py-2 mb-3", placeholder=form.original_link.label.text) }}
                   <p>
-                    {% for error in errors %}
+                    {% for error in form.original_link.errors %}
                       <span style="color:red">{{ error }}</span>
                     {% endfor %}
                   </p>
                     {{ form.custom_id(class="form-control form-control-lg py-2 mb-3", placeholder=form.custom_id.label.text) }}
                   <p>
-                    {% for error in errors %}
+                    {% for error in form.custom_id.errors %}
                       <span style="color:red">{{ error }}</span>
                     {% endfor %}
                   </p>
