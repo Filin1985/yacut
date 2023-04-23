@@ -69,12 +69,11 @@ class URLMap(db.Model):
                     raise ValidationError(
                         UNACCEPTABLE_URL.format(custom_id=custom_id)
                     )
+        custom_id = custom_id or URLMap.create_unique_custom_id()
         if URLMap.get_urlmap_item(custom_id):
             raise ExistenceError(
                 FLASH_CUSTOM_ID_EXISTS.format(custom_id=custom_id)
             )
-        if not custom_id or custom_id == '':
-            custom_id = URLMap.create_unique_custom_id()
         if validation:
             if len(original) > MAX_ORIGINAL_SIZE:
                 raise ValidationError(INCORRECT_URL)
