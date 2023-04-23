@@ -23,7 +23,7 @@ def post_short_url():
     custom_id = data.get('custom_id', None)
     try:
         urlmap_object = URLMap.create_urlmap(
-            original, custom_id
+            original, custom_id, validation=True
         )
     except ExistenceError:
         raise InvalidAPIUsage(SHORT_ID_EXISTS.format(custom_id=custom_id))

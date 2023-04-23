@@ -54,32 +54,29 @@ class URLMap(db.Model):
 
     @staticmethod
     def create_urlmap(
-        original, custom_id
+        original, custom_id, validation=False
     ):
-        if not (len(original) < MAX_ORIGINAL_SIZE):
+        if len(original) > MAX_ORIGINAL_SIZE:
             raise ValidationError(INCORRECT_URL)
-        if URLMap.get_urlmap_item(custom_id):
-            raise ExistenceError(
-                FLASH_CUSTOM_ID_EXISTS.format(custom_id=custom_id)
-            )
         if not custom_id or custom_id == '':
             custom_id = URLMap.create_unique_custom_id()
-        if (
-            custom_id != '' and
-            custom_id is not None
-        ):
-            match = re.match(CUSTOM_ID_REGEXP, custom_id)
-            if not (match is not None and match.group() == custom_id):
+        if validation:
+            if len(custom_id) > MAX_CUSTOM_ID_SIZE:
                 raise ValidationError(
                     UNACCEPTABLE_URL.format(custom_id=custom_id)
                 )
-            if len(custom_id) > MAX_CUSTOM_ID_SIZE:
+            match = re.match(CUSTOM_ID_REGEXP, custom_id)
+            if not (match is not None):
                 raise ValidationError(
                     UNACCEPTABLE_URL.format(custom_id=custom_id)
                 )
         parsed_url = urlparse(original)
         if not (parsed_url.scheme and parsed_url.netloc):
             raise ValidationError(INCORRECT_URL)
+        if URLMap.get_urlmap_item(custom_id):
+            raise ExistenceError(
+                FLASH_CUSTOM_ID_EXISTS.format(custom_id=custom_id)
+            )
         urlmap_object = URLMap(
             original=original,
             short=custom_id

@@ -1,5 +1,4 @@
 import os
-import re
 from string import ascii_letters, digits
 
 
@@ -8,7 +7,7 @@ GENERATION_NUMBER = 10
 MAX_CUSTOM_ID_SIZE = 16
 MAX_ORIGINAL_SIZE = 2048
 CUSTOM_ID_LENGTH = 6
-CUSTOM_ID_REGEXP = r'[' + re.escape(ALLOWED_SYMBOLS) + r']+'
+CUSTOM_ID_REGEXP = r'^[a-zA-Z0-9_]*$'
 REDIRECT_FUNCTION = 'redirect_to_original'
 
 
