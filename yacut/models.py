@@ -56,14 +56,7 @@ class URLMap(db.Model):
     def create_urlmap(
         original, custom_id, validation=False
     ):
-        if not custom_id or custom_id == '':
-            custom_id = URLMap.create_unique_custom_id()
         if validation:
-            if len(original) > MAX_ORIGINAL_SIZE:
-                raise ValidationError(INCORRECT_URL)
-            parsed_url = urlparse(original)
-            if not (parsed_url.scheme and parsed_url.netloc):
-                raise ValidationError(INCORRECT_URL)
             if (
                 custom_id != '' and
                 custom_id is not None and
@@ -72,8 +65,15 @@ class URLMap(db.Model):
                 raise ValidationError(
                     UNACCEPTABLE_URL.format(custom_id=custom_id)
                 )
-            match = re.match(CUSTOM_ID_REGEXP, custom_id)
-            if not (match is not None):
+        if not custom_id or custom_id == '':
+            custom_id = URLMap.create_unique_custom_id()
+        if validation:
+            if len(original) > MAX_ORIGINAL_SIZE:
+                raise ValidationError(INCORRECT_URL)
+            parsed_url = urlparse(original)
+            if not (parsed_url.scheme and parsed_url.netloc):
+                raise ValidationError(INCORRECT_URL)
+            if not re.match(CUSTOM_ID_REGEXP, custom_id):
                 raise ValidationError(
                     UNACCEPTABLE_URL.format(custom_id=custom_id)
                 )
