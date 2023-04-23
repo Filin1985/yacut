@@ -59,12 +59,20 @@ class URLMap(db.Model):
         if validation:
             if (
                 custom_id != '' and
-                custom_id is not None and
-                len(custom_id) > MAX_CUSTOM_ID_SIZE
+                custom_id is not None
             ):
-                raise ValidationError(
-                    UNACCEPTABLE_URL.format(custom_id=custom_id)
-                )
+                if len(custom_id) > MAX_CUSTOM_ID_SIZE:
+                    raise ValidationError(
+                        UNACCEPTABLE_URL.format(custom_id=custom_id)
+                    )
+                if not re.match(CUSTOM_ID_REGEXP, custom_id):
+                    raise ValidationError(
+                        UNACCEPTABLE_URL.format(custom_id=custom_id)
+                    )
+        if URLMap.get_urlmap_item(custom_id):
+            raise ExistenceError(
+                FLASH_CUSTOM_ID_EXISTS.format(custom_id=custom_id)
+            )
         if not custom_id or custom_id == '':
             custom_id = URLMap.create_unique_custom_id()
         if validation:
@@ -73,14 +81,6 @@ class URLMap(db.Model):
             parsed_url = urlparse(original)
             if not (parsed_url.scheme and parsed_url.netloc):
                 raise ValidationError(INCORRECT_URL)
-            if not re.match(CUSTOM_ID_REGEXP, custom_id):
-                raise ValidationError(
-                    UNACCEPTABLE_URL.format(custom_id=custom_id)
-                )
-        if URLMap.get_urlmap_item(custom_id):
-            raise ExistenceError(
-                FLASH_CUSTOM_ID_EXISTS.format(custom_id=custom_id)
-            )
         urlmap_object = URLMap(
             original=original,
             short=custom_id
