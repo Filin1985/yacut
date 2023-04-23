@@ -1,5 +1,5 @@
-from random import choices
 from datetime import datetime
+from random import choices
 import re
 from urllib.parse import urlparse
 
@@ -19,10 +19,8 @@ from .error_handlers import CreatingError, ExistenceError, ValidationError
 
 
 UNACCEPTABLE_URL = 'Указано недопустимое имя для короткой ссылки'
-SHORT_ID_EXISTS = 'Имя "{custom_id}" уже занято.'
-CREATE_SHORT_ID_ERROR = 'Не удалось сгенерировать ссылку!'
-SHORT_ID_INVALID = "Ссылка должна состоять только из цифр и латинских букв!"
-FLASH_SHORT_ID_EXISTS = 'Имя {custom_id} уже занято!'
+CREATE_CUSTOM_ID_ERROR = 'Не удалось сгенерировать ссылку!'
+FLASH_CUSTOM_ID_EXISTS = 'Имя {custom_id} уже занято!'
 INCORRECT_URL = 'Введите корректный URL адрес'
 
 
@@ -40,70 +38,52 @@ class URLMap(db.Model):
             )
         )
 
-    def from_dict(self, data):
-        self.original = data['url']
-        self.short = data['custom_id']
-
     @staticmethod
     def create_unique_custom_id():
         for _ in range(GENERATION_NUMBER):
             custom_id = ''.join(choices(
                 ALLOWED_SYMBOLS, k=CUSTOM_ID_LENGTH
             ))
-            if not URLMap.get_unique_custom_id(custom_id):
+            if not URLMap.get_urlmap_item(custom_id):
                 return custom_id
-        raise CreatingError(CREATE_SHORT_ID_ERROR)
+        raise CreatingError(CREATE_CUSTOM_ID_ERROR)
 
     @staticmethod
-    def validate_custom_id_length(custom_id):
-        if len(custom_id) > MAX_CUSTOM_ID_SIZE:
-            raise ValidationError(UNACCEPTABLE_URL.format(custom_id=custom_id))
-        return custom_id
-
-    @staticmethod
-    def validate_custom_id_symbols(custom_id):
-        match = re.match(CUSTOM_ID_REGEXP, custom_id)
-        if not (match is not None and match.group() == custom_id):
-            raise ValidationError(UNACCEPTABLE_URL.format(custom_id=custom_id))
-        return custom_id
-
-    @staticmethod
-    def get_unique_custom_id(custom_id):
+    def get_urlmap_item(custom_id):
         return URLMap.query.filter_by(short=custom_id).first()
 
     @staticmethod
-    def validate_url_scheme(original):
-        parsed_url = urlparse(original)
-        return (parsed_url.scheme and
-                parsed_url.netloc)
-
-    @staticmethod
-    def validate_url_size(original):
-        return len(original) < MAX_ORIGINAL_SIZE
-
-    @staticmethod
     def create_urlmap(
-        original, custom_id, existence_message
+        original, custom_id
     ):
+        if not (len(original) < MAX_ORIGINAL_SIZE):
+            raise ValidationError(INCORRECT_URL)
+        if URLMap.get_urlmap_item(custom_id):
+            raise ExistenceError(
+                FLASH_CUSTOM_ID_EXISTS.format(custom_id=custom_id)
+            )
         if not custom_id or custom_id == '':
             custom_id = URLMap.create_unique_custom_id()
-            print(custom_id)
-        if URLMap.get_unique_custom_id(custom_id):
-            raise ExistenceError(
-                existence_message.format(custom_id=custom_id)
-            )
         if (
             custom_id != '' and
             custom_id is not None
         ):
-            URLMap.validate_custom_id_symbols(custom_id)
-            URLMap.validate_custom_id_length(custom_id)
-        if not URLMap.validate_url_scheme(original):
+            match = re.match(CUSTOM_ID_REGEXP, custom_id)
+            if not (match is not None and match.group() == custom_id):
+                raise ValidationError(
+                    UNACCEPTABLE_URL.format(custom_id=custom_id)
+                )
+            if len(custom_id) > MAX_CUSTOM_ID_SIZE:
+                raise ValidationError(
+                    UNACCEPTABLE_URL.format(custom_id=custom_id)
+                )
+        parsed_url = urlparse(original)
+        if not (parsed_url.scheme and parsed_url.netloc):
             raise ValidationError(INCORRECT_URL)
-        url_object = URLMap(
+        urlmap_object = URLMap(
             original=original,
             short=custom_id
         )
-        db.session.add(url_object)
+        db.session.add(urlmap_object)
         db.session.commit()
-        return url_object
+        return urlmap_object

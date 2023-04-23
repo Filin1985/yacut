@@ -11,6 +11,10 @@ LINK_INCORRECT = 'Введите корректный адресс ссылки'
 SHORT_LINK_HINT = 'Введите ваш вариант короткой ссылки'
 SUBMIT_HINT = 'Создать'
 REGEXP_MESSAGE = 'Допустимы только цифры и латинские буквы'
+LINK_LENGTH_MESSAGE = f'Длина ссылки не должна превышать {MAX_ORIGINAL_SIZE}.'
+CUSTOM_ID_LENGTH_MESSAGE = (
+    f'Длина короткой ссылки не должна превышать {MAX_ORIGINAL_SIZE}.'
+)
 
 
 class URLForm(FlaskForm):
@@ -18,11 +22,12 @@ class URLForm(FlaskForm):
         LINK_HINT,
         validators=[DataRequired(message=LINK_REQUIRED),
                     URL(message=LINK_INCORRECT),
-                    Length(max=MAX_ORIGINAL_SIZE)]
+                    Length(max=MAX_ORIGINAL_SIZE, message=LINK_LENGTH_MESSAGE)]
     )
     custom_id = URLField(
         SHORT_LINK_HINT,
-        validators=[Length(max=MAX_CUSTOM_ID_SIZE),
+        validators=[Length(max=MAX_CUSTOM_ID_SIZE,
+                           message=CUSTOM_ID_LENGTH_MESSAGE),
                     Optional(),
                     Regexp(regex=CUSTOM_ID_REGEXP, message=REGEXP_MESSAGE)]
     )
